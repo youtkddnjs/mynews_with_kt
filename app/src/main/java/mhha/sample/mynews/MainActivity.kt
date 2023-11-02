@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.tickaroo.tikxml.TikXml
 import com.tickaroo.tikxml.retrofit.TikXmlConverterFactory
 import mhha.sample.mynews.databinding.ActivityMainBinding
@@ -27,15 +28,30 @@ class MainActivity : AppCompatActivity() {
         )
         .build()
 
+    private lateinit var newsAdapter: NewsAdapter
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        Log.e("mainactivity", "onCreate")
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        newsAdapter = NewsAdapter()
+
+
+        binding.newsRecyclerView.apply {
+            layoutManager = LinearLayoutManager(this@MainActivity)
+                adapter = newsAdapter
+        }
+
+
 
         val newsService = retrofit.create(NewsService::class.java)
         newsService.getMainNews().enqueue(object: Callback<Feed>{
             override fun onResponse(call: Call<Feed>, response: Response<Feed>) {
                 Log.e("mainactivity", "${response.body()?.channel?.items}")
+
+                newsAdapter.submitList(response.body()?.channel?.items.orEmpty())
+
             }
 
             override fun onFailure(call: Call<Feed>, t: Throwable) {
