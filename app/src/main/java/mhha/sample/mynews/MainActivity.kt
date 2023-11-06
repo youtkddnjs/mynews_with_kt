@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.tickaroo.tikxml.TikXml
 import com.tickaroo.tikxml.retrofit.TikXmlConverterFactory
 import mhha.sample.mynews.databinding.ActivityMainBinding
+import org.jsoup.Jsoup
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -41,7 +42,7 @@ class MainActivity : AppCompatActivity() {
         binding.newsRecyclerView.apply {
             layoutManager = LinearLayoutManager(this@MainActivity)
                 adapter = newsAdapter
-        }
+        } //binding.newsRecyclerView.apply
 
 
 
@@ -50,7 +51,30 @@ class MainActivity : AppCompatActivity() {
             override fun onResponse(call: Call<Feed>, response: Response<Feed>) {
                 Log.e("mainactivity", "${response.body()?.channel?.items}")
 
-                newsAdapter.submitList(response.body()?.channel?.items.orEmpty())
+                val list = response.body()?.channel?.items.orEmpty().transfrom()
+                newsAdapter.submitList(list)
+
+                list.forEachIndexed { index, newsModel ->
+                    Thread{
+                        try {
+                            val jsoup = Jsoup.connect(newsModel.link).get()
+                            val elements = jsoup.select("meta[property^=og:]")
+                            val ogImageNode = elements.find { node ->
+                                Log.e("mainactivity", "node : ${node}")
+                                node.attr("property") == "og:image"
+                            }
+                            newsModel.imageUrl = ogImageNode?.attr("content")
+                            Log.e("mainactivity", "images : ${newsModel.imageUrl}")
+                        }catch (e : Exception){
+                            e.printStackTrace()
+                        }
+                        runOnUiThread{
+                            newsAdapter.notifyItemChanged(index)
+                        }
+                    }.start() //Thread
+                }//list.forEach
+
+
 
             }
 
