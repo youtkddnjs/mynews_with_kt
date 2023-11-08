@@ -116,9 +116,7 @@ class MainActivity : AppCompatActivity() {
             }
             return@setOnEditorActionListener false
         }//binding.searchTextInputEditText.setOnEditorActionListener
-
-
-
+        
     }//override fun onCreate(savedInstanceState: Bundle?)
 
     private fun Call<Feed>.getNuws(){
