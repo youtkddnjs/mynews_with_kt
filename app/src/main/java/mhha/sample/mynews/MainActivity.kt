@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.chip.Chip
+import com.google.android.material.chip.ChipGroup
 import com.tickaroo.tikxml.TikXml
 import com.tickaroo.tikxml.retrofit.TikXmlConverterFactory
 import mhha.sample.mynews.databinding.ActivityMainBinding
@@ -37,17 +39,53 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         newsAdapter = NewsAdapter()
-
+        val newsService = retrofit.create(NewsService::class.java)
+        //newsService.getMainNews().getNuws()
 
         binding.newsRecyclerView.apply {
             layoutManager = LinearLayoutManager(this@MainActivity)
                 adapter = newsAdapter
         } //binding.newsRecyclerView.apply
 
+        binding.feedChip.setOnClickListener {
+            if( it is ChipGroup) it.clearCheck()
+            if( it is Chip) it.isChecked = true
+
+        } //binding.feedChip.setOnClickListener
+        binding.politicsChip.setOnClickListener {
+            binding.chipGroup.clearCheck()
+            binding.politicsChip.isChecked = true
+            newsService.getpolisticsNews().getNuws()
+        } //binding.politicsChip.setOnClickListener
+
+        binding.economyChip.setOnClickListener {
+            binding.chipGroup.clearCheck()
+            binding.economyChip.isChecked = true
+            newsService.geteconomyNews().getNuws()
+        } //binding.economyChip.setOnClickListener
+        binding.societyChip.setOnClickListener {
+            binding.chipGroup.clearCheck()
+            binding.societyChip.isChecked = true
+            newsService.getsocietyNews().getNuws()
+        } //binding.societyChip.setOnClickListener
+        binding.itChip.setOnClickListener {
+            binding.chipGroup.clearCheck()
+            binding.itChip.isChecked = true
+            newsService.getitNews().getNuws()
+        } //binding.itChip.setOnClickListener
+
+        binding.sportChip.setOnClickListener {
+            binding.chipGroup.clearCheck()
+            binding.sportChip.isChecked = true
+            newsService.getsportNews().getNuws()
+        } //binding.sportChip.setOnClickListener
 
 
-        val newsService = retrofit.create(NewsService::class.java)
-        newsService.getMainNews().enqueue(object: Callback<Feed>{
+
+    }//override fun onCreate(savedInstanceState: Bundle?)
+
+    private fun Call<Feed>.getNuws(){
+        this.enqueue(object: Callback<Feed>{
             override fun onResponse(call: Call<Feed>, response: Response<Feed>) {
                 Log.e("mainactivity", "${response.body()?.channel?.items}")
 
@@ -73,18 +111,14 @@ class MainActivity : AppCompatActivity() {
                         }
                     }.start() //Thread
                 }//list.forEach
-
-
-
-            }
+            }//override fun onResponse(call: Call<Feed>, response: Response<Feed>)
 
             override fun onFailure(call: Call<Feed>, t: Throwable) {
                 Toast.makeText(this@MainActivity, "에러",Toast.LENGTH_SHORT).show()
                 Log.e("mainactivity", "에러")
                 t.printStackTrace() // 에러 표시하는 코드
-            }
-        }) //newsService.getMainNews().enqueue(object: Callback<Feed>{
+            }//override fun onFailure(call: Call<Feed>, t: Throwable)
+        })//this.enqueue(object: Callback<Feed>
+    }//private fun Call<Feed>.getNuws()
 
-
-    }//override fun onCreate(savedInstanceState: Bundle?)
 }//class MainActivity : AppCompatActivity()
