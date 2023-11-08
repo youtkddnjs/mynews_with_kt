@@ -1,12 +1,14 @@
 package mhha.sample.mynews
 
 import android.content.Context
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
@@ -41,7 +43,13 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        newsAdapter = NewsAdapter()
+        newsAdapter = NewsAdapter{
+            startActivity(
+                Intent(this,WebViewActivity::class.java).apply {
+                    putExtra("url", it)
+                }
+            )
+        } //newsAdapter = NewsAdapter
         val newsService = retrofit.create(NewsService::class.java)
         //newsService.getMainNews().getNuws()
 
@@ -52,34 +60,40 @@ class MainActivity : AppCompatActivity() {
 
         binding.chipGroup.clearCheck()
         binding.feedChip.setOnClickListener {
+            binding.searchTextInputEditText.text = null
             binding.chipGroup.clearCheck()
             binding.feedChip.isChecked = true
             newsService.getMainNews().getNuws()
 
         } //binding.feedChip.setOnClickListener
         binding.politicsChip.setOnClickListener {
+            binding.searchTextInputEditText.text = null
             binding.chipGroup.clearCheck()
             binding.politicsChip.isChecked = true
             newsService.getpolisticsNews().getNuws()
         } //binding.politicsChip.setOnClickListener
 
         binding.economyChip.setOnClickListener {
+            binding.searchTextInputEditText.text = null
             binding.chipGroup.clearCheck()
             binding.economyChip.isChecked = true
             newsService.geteconomyNews().getNuws()
         } //binding.economyChip.setOnClickListener
         binding.societyChip.setOnClickListener {
+            binding.searchTextInputEditText.text = null
             binding.chipGroup.clearCheck()
             binding.societyChip.isChecked = true
             newsService.getsocietyNews().getNuws()
         } //binding.societyChip.setOnClickListener
         binding.itChip.setOnClickListener {
+            binding.searchTextInputEditText.text = null
             binding.chipGroup.clearCheck()
             binding.itChip.isChecked = true
             newsService.getitNews().getNuws()
         } //binding.itChip.setOnClickListener
 
         binding.sportChip.setOnClickListener {
+            binding.searchTextInputEditText.text = null
             binding.chipGroup.clearCheck()
             binding.sportChip.isChecked = true
             newsService.getsportNews().getNuws()
@@ -94,12 +108,16 @@ class MainActivity : AppCompatActivity() {
                 ims.hideSoftInputFromWindow(v.windowToken, 0)
                 // 포커스 제거
                 binding.searchTextInputEditText.clearFocus()
+                // 글자제거
+                binding.searchTextInputEditText.text = null
 
                 newsService.search(binding.searchTextInputEditText.text.toString()).getNuws()
                 return@setOnEditorActionListener true
             }
             return@setOnEditorActionListener false
-        }
+        }//binding.searchTextInputEditText.setOnEditorActionListener
+
+
 
     }//override fun onCreate(savedInstanceState: Bundle?)
 
@@ -110,7 +128,7 @@ class MainActivity : AppCompatActivity() {
 
                 val list = response.body()?.channel?.items.orEmpty().transfrom()
                 newsAdapter.submitList(list)
-
+                binding.notFountView.isVisible = list.isEmpty()
                 list.forEachIndexed { index, newsModel ->
                     Thread{
                         try {

@@ -62,4 +62,7 @@ dependencies {
     //Gilde
     implementation("com.github.bumptech.glide:glide:4.14.2")
 
+    //lottie
+    implementation ("com.airbnb.android:lottie:6.1.0")
+
 }
