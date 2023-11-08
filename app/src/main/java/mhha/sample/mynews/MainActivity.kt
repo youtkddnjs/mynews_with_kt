@@ -1,8 +1,11 @@
 package mhha.sample.mynews
 
+import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.chip.Chip
@@ -47,9 +50,11 @@ class MainActivity : AppCompatActivity() {
                 adapter = newsAdapter
         } //binding.newsRecyclerView.apply
 
+        binding.chipGroup.clearCheck()
         binding.feedChip.setOnClickListener {
-            if( it is ChipGroup) it.clearCheck()
-            if( it is Chip) it.isChecked = true
+            binding.chipGroup.clearCheck()
+            binding.feedChip.isChecked = true
+            newsService.getMainNews().getNuws()
 
         } //binding.feedChip.setOnClickListener
         binding.politicsChip.setOnClickListener {
@@ -80,7 +85,21 @@ class MainActivity : AppCompatActivity() {
             newsService.getsportNews().getNuws()
         } //binding.sportChip.setOnClickListener
 
+        //검색 기능
+        binding.searchTextInputEditText.setOnEditorActionListener { v, actionId, event ->
+            if(actionId == EditorInfo.IME_ACTION_SEARCH){
+                binding.chipGroup.clearCheck()
+                //키보드 내려감
+                val ims = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                ims.hideSoftInputFromWindow(v.windowToken, 0)
+                // 포커스 제거
+                binding.searchTextInputEditText.clearFocus()
 
+                newsService.search(binding.searchTextInputEditText.text.toString()).getNuws()
+                return@setOnEditorActionListener true
+            }
+            return@setOnEditorActionListener false
+        }
 
     }//override fun onCreate(savedInstanceState: Bundle?)
 

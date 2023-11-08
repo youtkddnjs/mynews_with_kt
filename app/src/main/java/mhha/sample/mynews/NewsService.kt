@@ -2,6 +2,7 @@ package mhha.sample.mynews
 
 import retrofit2.Call
 import retrofit2.http.GET
+import retrofit2.http.Query
 
 interface NewsService {
 
@@ -27,5 +28,8 @@ interface NewsService {
     //topics/CAAqJggKIiBDQkFTRWdvSUwyMHZNRFp1ZEdvU0FtdHZHZ0pMVWlnQVAB?hl=ko&gl=KR&ceid=KR%3Ako
     @GET("/rss/search?q=스포츠&hl=ko&gl=KR&ceid=KR:ko")
     fun getsportNews(): Call<Feed>
+
+    @GET("/rss/search?&hl=ko&gl=KR&ceid=KR:ko")
+    fun search(@Query("q") query: String): Call<Feed>
 
 }
